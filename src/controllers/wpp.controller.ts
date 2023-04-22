@@ -34,24 +34,7 @@ const webhook = async (req: Request, res: Response) => {
     }
 };
 
-const viewMedia = async (req: Request, res: Response) => {
-    const { media_id } = req.params;
-
-    if (!media_id) {
-        return res.sendStatus(404);
-    }
-
-    const mediaUrl = await services.wpp.getMediaUrl(media_id);
-    const buffer = await services.wpp.getMedia(mediaUrl);
-
-    res.setHeader("Content-Type", "image/jpeg");
-    res.setHeader("Content-Length", buffer.length);
-
-    return Readable.from(buffer).pipe(res);
-};
-
 export default {
     webhookVerification,
     webhook,
-    viewMedia
 };

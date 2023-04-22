@@ -131,10 +131,10 @@ export class WhatsappService {
         return this.commandPrefix;
     }
 
-    async uploadSticker(sticker: string | Buffer) {
+    async uploadSticker(sticker: Buffer) {
         const formdata = new FormData();
         formdata.append("messaging_product", "whatsapp");
-        formdata.append("file", sticker);
+        formdata.append("file", sticker.buffer);
 
         const res = await axios.post(
             `https://graph.facebook.com/v16.0/${process.env.PHONE_ID}/media`,

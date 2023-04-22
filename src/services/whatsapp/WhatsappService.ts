@@ -1,4 +1,5 @@
 import axios, { AxiosError } from "axios";
+import FormData from "form-data";
 
 export class WhatsappService {
     protected readonly commandPrefix: string = "@";
@@ -138,7 +139,7 @@ export class WhatsappService {
             sticker instanceof Buffer ? sticker.toString("utf-8") : sticker
         );
 
-        await axios.post(
+        const res = await axios.post(
             `https://graph.facebook.com/v16.0/${process.env.PHONE_ID}/media`,
             formdata,
             {
@@ -148,5 +149,7 @@ export class WhatsappService {
                 },
             }
         );
+
+        return res.data.id;
     }
 }

@@ -19,15 +19,14 @@ export class ConverterManager implements ResponseManagerInterface {
         stream.push(buffer);
         stream.push(null);
 
-        const outputStream = new Transform();
-
-        ffmpeg(stream).format("webp").output(outputStream);
+        const outputStream = ffmpeg(stream).format("webp").pipe();
 
         const outputBuffer: Buffer = await new Promise((resolve, reject) => {
             const buffers: any[] = [];
 
             outputStream.on("data", (data) => {
                 buffers.push(data);
+                console.log(data);
             });
 
             outputStream.on("end", () => {

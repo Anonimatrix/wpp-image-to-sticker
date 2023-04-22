@@ -22,8 +22,10 @@ export class RequestManager implements RequestManagerInterface {
                 media_url,
             ]);
 
+            const id = await services.wpp.uploadSticker(response);
+
             // Sending the response
-            await services.wpp.sendMessage(from, response, "sticker");
+            await services.wpp.sendMessage(from, id, "sticker");
         } catch (e) {
             throw e;
         }

@@ -16,17 +16,6 @@ export class RequestManager implements RequestManagerInterface {
             return 400;
         }
 
-        // Getting the chat by the phone number
-        const chat =
-            services.chatManager.getChatByNumber(from) ||
-            services.chatManager.addChat(from);
-
-        //Adding message and setting the timeout to remove chat if the timeout is reached
-        chat.addMessage({ body: media_url }, async () => {
-            await services.wpp.sendMessage(from, config.timeoutMessage);
-            services.chatManager.removeChat(from);
-        });
-
         try {
             // Getting the response from the message
             const response = await services.responseManager.getResponse([

@@ -1,5 +1,6 @@
 import axios, { AxiosError } from "axios";
 import FormData from "form-data";
+import { Readable } from "stream";
 
 export class WhatsappService {
     protected readonly commandPrefix: string = "@";
@@ -132,9 +133,13 @@ export class WhatsappService {
     }
 
     async uploadSticker(sticker: Buffer) {
+        const fileStream = new Readable();
+        fileStream.push(sticker);
+        fileStream.push(null);
+
         const formdata = new FormData();
         formdata.append("messaging_product", "whatsapp");
-        formdata.append("file", sticker.buffer);
+        formdata.append("file", fileStream);
 
         const res = await axios.post(
             `https://graph.facebook.com/v16.0/${process.env.PHONE_ID}/media`,

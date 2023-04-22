@@ -1,3 +1,3 @@
 export interface ResponseManagerInterface {
-    getResponse(messages: string[]): Promise<string>;
+    getResponse(messages: string[]): Promise<string | Buffer>;
 }

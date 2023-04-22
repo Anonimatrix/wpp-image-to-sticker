@@ -13,8 +13,12 @@ export class ConverterManager implements ResponseManagerInterface {
             },
         });
 
-        const buffer = res.data;
+        const outputBuffer = await this.bufferJpgToWebp(res.data);
 
+        return outputBuffer.toString("utf-8");
+    }
+
+    async bufferJpgToWebp(buffer: Buffer) {
         const stream = new Readable();
         stream.push(buffer);
         stream.push(null);
@@ -26,18 +30,20 @@ export class ConverterManager implements ResponseManagerInterface {
 
             outputStream.on("data", (data) => {
                 buffers.push(data);
-                console.log(data);
+            });
+
+            outputStream.on("error", (err) => {
+                console.log("ERROR");
+                reject(err);
             });
 
             outputStream.on("end", () => {
                 resolve(Buffer.concat(buffers));
-            });
-
-            outputStream.on("error", (err) => {
-                reject(err);
+                outputStream.destroy();
+                console.log("END");
             });
         });
 
-        return outputBuffer.toString("utf-8");
+        return outputBuffer;
     }
 }

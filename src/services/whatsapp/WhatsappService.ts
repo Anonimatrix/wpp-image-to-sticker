@@ -141,17 +141,28 @@ export class WhatsappService {
         formdata.append("messaging_product", "whatsapp");
         formdata.append("file", fileStream);
 
-        const res = await axios.post(
-            `https://graph.facebook.com/v16.0/${process.env.PHONE_ID}/media`,
-            formdata,
-            {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                    Authorization: `Bearer ${process.env.WHATSAPP_TOKEN}`,
-                },
-            }
-        );
+        try {
+            const res = await axios.post(
+                `https://graph.facebook.com/v16.0/${process.env.PHONE_ID}/media`,
+                formdata,
+                {
+                    headers: {
+                        "Content-Type": `multipart/form-data; boundary=${formdata.getBoundary()}`,
+                        Authorization: `Bearer ${process.env.WHATSAPP_TOKEN}`,
+                    },
+                }
+            );
 
-        return res.data.id;
+            return res.data.id;
+        } catch (e) {
+            const msgError =
+                e instanceof AxiosError
+                    ? e.response?.data?.error.message
+                    : e instanceof Error
+                    ? e.message
+                    : "Unknown error";
+
+            throw new Error(msgError);
+        }
     }
 }

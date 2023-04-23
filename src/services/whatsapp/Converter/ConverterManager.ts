@@ -24,7 +24,7 @@ export class ConverterManager implements ResponseManagerInterface {
 
         const msg_body = messages[1];
         // Convert message to options
-        const options = [...msg_body.matchAll(/(\w+)=(\w+)/g)];
+        const options = [...msg_body.toLowerCase().matchAll(/(\w+)=(\w+)/g)];
         //Getting options
         const parsedOptions = options.reduce((acc, curr) => {
             (acc as any)[curr[1]] = curr[2];

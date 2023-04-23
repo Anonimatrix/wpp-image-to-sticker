@@ -27,12 +27,30 @@ export class ConverterManager implements ResponseManagerInterface {
 
         const outputStream = new PassThrough();
 
+        //Set the crop query
+        const minSize = "min(iw, ih)";
+        const cropQuery = `crop='${minSize}':'${minSize}':'if(gte(ih, iw), 0, iw / 2 - ${minSize} / 2)':'if(gte(iw, ih), 0,  ih / 2 - ${minSize} / 2)'`;
+
+        // Create a webp file in output stream
         await new Promise((resolve, reject) => {
             ffmpeg(stream)
-                .videoCodec("libwebp")
-                .toFormat("webp")
+                .withVideoCodec("libwebp")
+                .withOptions([
+                    "-loop 0",
+                    "-lossless 0",
+                    "-preset default",
+                    "-compression_level 6",
+                    "-q:v 40",
+                    "-an",
+                    "-vsync 2",
+                ])
+                .videoBitrate("128k")
+                .outputFps(4)
+                .videoFilters(cropQuery)
                 .setSize("512x512")
-                .autoPad(true)
+                .toFormat("webp")
+                .on("start", (commandLine) => console.log(commandLine))
+                .on("progess", (progress) => console.log(progress))
                 .on("error", (err) => {
                     console.log("An error occurred: " + err.message);
                     reject(err);
@@ -40,9 +58,10 @@ export class ConverterManager implements ResponseManagerInterface {
                 .on("end", function () {
                     resolve("");
                 })
-                .pipe(outputStream);
+                .pipe(outputStream, { end: true });
         });
 
+        //Then convert the webp file to a buffer
         const outputBuffer: Buffer = await new Promise((resolve, reject) => {
             const buffers: any[] = [];
 
@@ -55,7 +74,6 @@ export class ConverterManager implements ResponseManagerInterface {
             });
 
             outputStream.on("close", () => {
-                console.log("END");
                 resolve(Buffer.concat(buffers));
             });
         });

@@ -39,7 +39,7 @@ export class WhatsappService {
 
         const image_id = message.image?.id || "";
 
-        const media_url = await this.getMediaUrl(image_id);
+        const media_url = image_id ? await this.getMediaUrl(image_id) : "";
 
         return {
             phone_number_id,

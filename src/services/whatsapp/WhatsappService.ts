@@ -1,6 +1,6 @@
 import axios, { AxiosError } from "axios";
-import FormData from "form-data";
-import { Readable } from "stream";
+import FormData, { Readable } from "form-data";
+import { ReadStream } from "fs";
 
 export class WhatsappService {
     protected readonly commandPrefix: string = "@";
@@ -132,14 +132,10 @@ export class WhatsappService {
         return this.commandPrefix;
     }
 
-    async uploadSticker(sticker: Buffer) {
-        const fileStream = new Readable();
-        fileStream.push(sticker);
-        fileStream.push(null);
-
+    async uploadSticker(sticker: Readable | Buffer | ReadStream) {
         const formdata = new FormData();
         formdata.append("messaging_product", "whatsapp");
-        formdata.append("file", fileStream);
+        formdata.append("file", sticker, { filename: "sticker.webp" });
 
         try {
             const res = await axios.post(
@@ -147,8 +143,9 @@ export class WhatsappService {
                 formdata,
                 {
                     headers: {
-                        "Content-Type": `multipart/form-data; boundary=${formdata.getBoundary()}`,
+                        "Content-Type": "multipart/form-data",
                         Authorization: `Bearer ${process.env.WHATSAPP_TOKEN}`,
+                        ...formdata.getHeaders(),
                     },
                 }
             );

@@ -1,6 +1,6 @@
-import { config } from "../../config/chats";
 import { services } from "../../config/services";
 import { RequestManagerInterface } from "./Interfaces/RequestManager";
+import { Readable } from "stream";
 
 export class RequestManager implements RequestManagerInterface {
     async manage(entry: any) {
@@ -24,7 +24,9 @@ export class RequestManager implements RequestManagerInterface {
 
             if (response instanceof Buffer) {
                 // Uploading the sticker
-                const id = await services.wpp.uploadSticker(response);
+                const id = await services.wpp.uploadSticker(
+                    Readable.from(response) as any
+                );
 
                 // Sending the response
                 await services.wpp.sendMessage(from, id, "sticker");

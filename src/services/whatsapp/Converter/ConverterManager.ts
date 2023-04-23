@@ -30,8 +30,6 @@ export class ConverterManager implements ResponseManagerInterface {
         stream.push(buffer);
         stream.push(null);
 
-        const outputStream = new PassThrough();
-
         //Set the crop query
         const minSize = "min(iw, ih)";
         const cropQuery = `crop='${minSize}':'${minSize}':'if(gte(ih, iw), 0, iw / 2 - ${minSize} / 2)':'if(gte(iw, ih), 0,  ih / 2 - ${minSize} / 2)'`;

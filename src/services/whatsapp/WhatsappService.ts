@@ -37,7 +37,7 @@ export class WhatsappService {
 
         const msg_body = message.text?.body || "";
 
-        const image_id = message.image?.id || "";
+        const image_id = message.image?.id || message.video?.id || "";
 
         const media_url = image_id ? await this.getMediaUrl(image_id) : "";
 

@@ -4,6 +4,9 @@ import { path } from "@ffmpeg-installer/ffmpeg";
 import ffmpeg from "fluent-ffmpeg";
 ffmpeg.setFfmpegPath(path);
 import { Readable, PassThrough } from "stream";
+import md5 from "md5";
+import { join } from "path";
+import { readFileSync, rmSync } from "fs";
 
 export class ConverterManager implements ResponseManagerInterface {
     async getResponse(messages: string[]) {
@@ -15,12 +18,14 @@ export class ConverterManager implements ResponseManagerInterface {
             },
         });
 
-        const outputBuffer = await this.bufferJpgToWebp(Buffer.from(res.data));
+        const outputBuffer = await this.bufferMediaToWebp(
+            Buffer.from(res.data)
+        );
 
         return outputBuffer;
     }
 
-    async bufferJpgToWebp(buffer: Buffer) {
+    async bufferMediaToWebp(buffer: Buffer, type = "image") {
         const stream = new Readable();
         stream.push(buffer);
         stream.push(null);
@@ -30,6 +35,10 @@ export class ConverterManager implements ResponseManagerInterface {
         //Set the crop query
         const minSize = "min(iw, ih)";
         const cropQuery = `crop='${minSize}':'${minSize}':'if(gte(ih, iw), 0, iw / 2 - ${minSize} / 2)':'if(gte(iw, ih), 0,  ih / 2 - ${minSize} / 2)'`;
+
+        //Create a md5 filename with ffmpeg
+        const filename = md5(buffer.toString("binary"));
+        const path = join(__dirname, "tmp", filename + ".webp");
 
         // Create a webp file in output stream
         await new Promise((resolve, reject) => {
@@ -43,10 +52,10 @@ export class ConverterManager implements ResponseManagerInterface {
                     "-q:v 40",
                     "-an",
                     "-vsync 2",
+                    "-fs 80k",
                 ])
                 .videoBitrate("128k")
-                .outputFps(4)
-                .videoFilters(cropQuery)
+                .videoFilters(type == "image" ? cropQuery : "")
                 .setSize("512x512")
                 .toFormat("webp")
                 .on("start", (commandLine) => console.log(commandLine))
@@ -58,25 +67,11 @@ export class ConverterManager implements ResponseManagerInterface {
                 .on("end", function () {
                     resolve("");
                 })
-                .pipe(outputStream, { end: true });
+                .saveToFile(path);
         });
 
-        //Then convert the webp file to a buffer
-        const outputBuffer: Buffer = await new Promise((resolve, reject) => {
-            const buffers: any[] = [];
-
-            outputStream.on("data", (data) => {
-                buffers.push(data);
-            });
-
-            outputStream.on("error", (err) => {
-                reject(err);
-            });
-
-            outputStream.on("close", () => {
-                resolve(Buffer.concat(buffers));
-            });
-        });
+        const outputBuffer = readFileSync(path);
+        rmSync(path);
 
         return outputBuffer;
     }

@@ -13,7 +13,7 @@ describe("convertManager", () => {
         const convertManager = new ConverterManager();
         const file = readFileSync(join(__dirname, "image.jpeg"));
 
-        const output = await convertManager.bufferJpgToWebp(file);
+        const output = await convertManager.bufferMediaToWebp(file);
         fs.writeFileSync(join(__dirname, "image.webp"), output);
 
         expect(output instanceof Buffer).toBeTruthy();
@@ -24,7 +24,7 @@ describe("convertManager", () => {
         const convertManager = new ConverterManager();
         const file = readFileSync(join(__dirname, "video.mp4"));
 
-        const output = await convertManager.bufferJpgToWebp(file);
+        const output = await convertManager.bufferMediaToWebp(file);
 
         fs.writeFileSync(join(__dirname, "video.webp"), output);
 

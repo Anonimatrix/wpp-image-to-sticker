@@ -3,7 +3,7 @@ import { ResponseManagerInterface } from "../Interfaces/ResponseManager";
 import { path } from "@ffmpeg-installer/ffmpeg";
 import ffmpeg from "fluent-ffmpeg";
 ffmpeg.setFfmpegPath(path);
-import { Readable, PassThrough } from "stream";
+import { Readable } from "stream";
 import md5 from "md5";
 import { join, parse } from "path";
 import { readFileSync, rmSync, mkdirSync } from "fs";

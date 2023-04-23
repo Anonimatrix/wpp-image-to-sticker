@@ -35,7 +35,11 @@ export class WhatsappService {
 
         const from = message.from.replace("549", "54");
 
-        const msg_body = message.text?.body || "";
+        const msg_body =
+            message.text?.body ||
+            message.image?.caption ||
+            message.video?.caption ||
+            "";
 
         const image_id = message.image?.id || message.video?.id || "";
 

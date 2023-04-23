@@ -68,7 +68,7 @@ export class ConverterManager implements ResponseManagerInterface {
                     "-lossless 0",
                     "-preset icon",
                     "-compression_level 12",
-                    "-q:v 5",
+                    "-q:v 7",
                     "-an",
                     "-vsync 1",
                     "-fs 450k",

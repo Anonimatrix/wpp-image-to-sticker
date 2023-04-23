@@ -46,11 +46,10 @@ export class ConverterManager implements ResponseManagerInterface {
         const cropQuery = `crop='${minSize}':'${minSize}':'if(gte(ih, iw), 0, iw / 2 - ${minSize} / 2)':'if(gte(iw, ih), 0,  ih / 2 - ${minSize} / 2)'`;
 
         if (options.speed) {
-            options.speed = options.speed > 2 ? 2 : options.speed;
-            options.speed = options.speed < 0.5 ? 0.5 : options.speed;
+            options.speed = options.speed < 0 ? 1 : options.speed;
         }
 
-        let speedQuery = options.speed ? `setpts=${options.speed}*PTS` : "";
+        let speedQuery = options.speed ? `setpts=PTS/${options.speed}` : "";
 
         //Create a md5 filename with ffmpeg
         const filename = md5(buffer.toString("binary"));
@@ -71,11 +70,11 @@ export class ConverterManager implements ResponseManagerInterface {
                     "-compression_level 12",
                     "-q:v 5",
                     "-an",
-                    "-vsync 2",
+                    "-vsync 1",
                     "-fs 450k",
                 ])
                 .videoBitrate("16k")
-                .videoFilters(cropQuery + " " + speedQuery)
+                .videoFilters([cropQuery, speedQuery].join(",").trim())
                 .setSize("512x512")
                 .toFormat("webp")
                 .on("start", (commandLine) => console.log(commandLine))

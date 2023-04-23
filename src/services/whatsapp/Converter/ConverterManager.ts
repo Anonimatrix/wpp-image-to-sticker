@@ -5,8 +5,8 @@ import ffmpeg from "fluent-ffmpeg";
 ffmpeg.setFfmpegPath(path);
 import { Readable, PassThrough } from "stream";
 import md5 from "md5";
-import { join } from "path";
-import { readFileSync, rmSync } from "fs";
+import { join, parse } from "path";
+import { readFileSync, rmSync, mkdirSync } from "fs";
 
 export class ConverterManager implements ResponseManagerInterface {
     async getResponse(messages: string[]) {
@@ -37,6 +37,10 @@ export class ConverterManager implements ResponseManagerInterface {
         //Create a md5 filename with ffmpeg
         const filename = md5(buffer.toString("binary"));
         const path = join(__dirname, "tmp", filename + ".webp");
+
+        const parsedPath = parse(path);
+
+        mkdirSync(parsedPath.dir, { recursive: true });
 
         // Create a webp file in output stream
         await new Promise((resolve, reject) => {

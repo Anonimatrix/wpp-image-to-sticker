@@ -113,13 +113,13 @@ export class WhatsappService {
     }
 
     protected getBodyMessage(msg_body: string, type = "text") {
-        let extraData = {};
+        let extraData: { [key: string]: object } = {};
         if (type === "sticker") {
-            extraData = {
+            extraData[type] = {
                 id: msg_body,
             };
         } else {
-            extraData = {
+            extraData[type] = {
                 body: msg_body,
                 preview_url: true,
             };

@@ -4,6 +4,7 @@ import { join } from "path";
 import { path } from "@ffmpeg-installer/ffmpeg";
 import ffmpeg from "fluent-ffmpeg";
 ffmpeg.setFfmpegPath(path);
+import fs from "fs";
 
 describe("convertManager", () => {
     it("should convert a file to a webp", async () => {

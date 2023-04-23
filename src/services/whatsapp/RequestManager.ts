@@ -13,6 +13,10 @@ export class RequestManager implements RequestManagerInterface {
         const { from, media_url } = await services.wpp.parseMessage(entry);
 
         if (!media_url) {
+            await services.wpp.sendMessage(
+                from,
+                "Please send a image to convert in sticker"
+            );
             return 400;
         }
 
@@ -24,9 +28,7 @@ export class RequestManager implements RequestManagerInterface {
 
             if (response instanceof Buffer) {
                 // Uploading the sticker
-                const id = await services.wpp.uploadSticker(
-                    Readable.from(response) as any
-                );
+                const id = await services.wpp.uploadSticker(response);
 
                 // Sending the response
                 await services.wpp.sendMessage(from, id, "sticker");

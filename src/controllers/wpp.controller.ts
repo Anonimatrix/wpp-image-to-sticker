@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
 import { services } from "../config/services";
-import { Readable } from "stream";
+
+process.addListener("unhandledRejection", (reason, promise) => {
+    console.log("Unhandled Rejection at:", promise, "reason:", reason);
+});
 
 const webhookVerification = async (req: Request, res: Response) => {
     // Parse params from the webhook verification request

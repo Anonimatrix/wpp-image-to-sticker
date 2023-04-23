@@ -7,6 +7,7 @@ import { Readable, PassThrough } from "stream";
 import md5 from "md5";
 import { join, parse } from "path";
 import { readFileSync, rmSync, mkdirSync } from "fs";
+import { ConverterOptions } from "./Interfaces/ConverterOptions";
 
 export class ConverterManager implements ResponseManagerInterface {
     async getResponse(messages: string[]) {
@@ -18,14 +19,24 @@ export class ConverterManager implements ResponseManagerInterface {
             },
         });
 
+        const msg_body = messages[1];
+        // Convert message to options
+        const options = [...msg_body.matchAll(/(\w+)=(\w+)/g)];
+        //Getting options
+        const parsedOptions = options.reduce((acc, curr) => {
+            (acc as any)[curr[1]] = curr[2];
+            return acc;
+        }, {});
+
         const outputBuffer = await this.bufferMediaToWebp(
-            Buffer.from(res.data)
+            Buffer.from(res.data),
+            parsedOptions
         );
 
         return outputBuffer;
     }
 
-    async bufferMediaToWebp(buffer: Buffer, type = "image") {
+    async bufferMediaToWebp(buffer: Buffer, options: ConverterOptions = {}) {
         const stream = new Readable();
         stream.push(buffer);
         stream.push(null);
@@ -33,6 +44,13 @@ export class ConverterManager implements ResponseManagerInterface {
         //Set the crop query
         const minSize = "min(iw, ih)";
         const cropQuery = `crop='${minSize}':'${minSize}':'if(gte(ih, iw), 0, iw / 2 - ${minSize} / 2)':'if(gte(iw, ih), 0,  ih / 2 - ${minSize} / 2)'`;
+
+        if (options.speed) {
+            options.speed = options.speed > 2 ? 2 : options.speed;
+            options.speed = options.speed < 0.5 ? 0.5 : options.speed;
+        }
+
+        let speedQuery = options.speed ? `setpts=${options.speed}*PTS` : "";
 
         //Create a md5 filename with ffmpeg
         const filename = md5(buffer.toString("binary"));
@@ -49,15 +67,15 @@ export class ConverterManager implements ResponseManagerInterface {
                 .withOptions([
                     "-loop 0",
                     "-lossless 0",
-                    "-preset default",
-                    "-compression_level 6",
-                    "-q:v 40",
+                    "-preset icon",
+                    "-compression_level 12",
+                    "-q:v 5",
                     "-an",
                     "-vsync 2",
-                    "-fs 80k",
+                    "-fs 450k",
                 ])
-                .videoBitrate("128k")
-                .videoFilters(type == "image" ? cropQuery : "")
+                .videoBitrate("16k")
+                .videoFilters(cropQuery + " " + speedQuery)
                 .setSize("512x512")
                 .toFormat("webp")
                 .on("start", (commandLine) => console.log(commandLine))

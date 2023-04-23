@@ -10,7 +10,9 @@ export class RequestManager implements RequestManagerInterface {
         }
 
         // Parsing all information from the message
-        const { from, media_url } = await services.wpp.parseMessage(entry);
+        const { from, media_url, msg_body } = await services.wpp.parseMessage(
+            entry
+        );
 
         if (!media_url) {
             await services.wpp.sendMessage(
@@ -24,6 +26,7 @@ export class RequestManager implements RequestManagerInterface {
             // Getting the response from the message
             const response = await services.responseManager.getResponse([
                 media_url,
+                msg_body,
             ]);
 
             if (response instanceof Buffer) {

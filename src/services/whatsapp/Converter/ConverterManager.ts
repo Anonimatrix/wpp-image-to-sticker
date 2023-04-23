@@ -10,6 +10,9 @@ import { readFileSync, rmSync, mkdirSync } from "fs";
 import { ConverterOptions } from "./Interfaces/ConverterOptions";
 
 export class ConverterManager implements ResponseManagerInterface {
+    /**
+     * @param messages - First message is the media url and the second is the message body
+     */
     async getResponse(messages: string[]) {
         const res = await axios.get(messages[0], {
             responseType: "arraybuffer",
@@ -59,6 +62,11 @@ export class ConverterManager implements ResponseManagerInterface {
 
         mkdirSync(parsedPath.dir, { recursive: true });
 
+        const videoFilters: string[] = [];
+
+        if (speedQuery) videoFilters.push(speedQuery);
+        if (cropQuery) videoFilters.push(cropQuery);
+
         // Create a webp file in output stream
         await new Promise((resolve, reject) => {
             ffmpeg(stream)
@@ -74,7 +82,7 @@ export class ConverterManager implements ResponseManagerInterface {
                     "-fs 450k",
                 ])
                 .videoBitrate("16k")
-                .videoFilters([cropQuery, speedQuery].join(",").trim())
+                .videoFilters(videoFilters.join(","))
                 .setSize("512x512")
                 .toFormat("webp")
                 .on("start", (commandLine) => console.log(commandLine))

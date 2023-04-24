@@ -1,6 +1,5 @@
 import { invalidFormatMessage, welcomeMessage } from "../../config/messages";
 import { services } from "../../config/services";
-import { ChatInterface } from "./Interfaces/ChatInterface";
 import { RequestManagerInterface } from "./Interfaces/RequestManager";
 
 export class RequestManager implements RequestManagerInterface {

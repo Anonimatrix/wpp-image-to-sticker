@@ -1,7 +1,6 @@
 import { ChatInterface } from "../Interfaces/ChatInterface";
 import { ChatManagerInterface } from "../Interfaces/ChatManagerInterface";
 import { ChatModel } from "../../../models/models";
-import { DbChat } from "./Chat";
 import { services } from "../../../config/services";
 
 interface ChatsInterface {

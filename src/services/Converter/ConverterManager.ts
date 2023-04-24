@@ -116,24 +116,29 @@ export class ConverterManager implements ResponseManagerInterface {
         videoFilters: string[] = [],
         userOutputOptions: string[] = []
     ) {
-        const command = ffmpeg(stream)
-            .withVideoCodec("libwebp")
-            .withOptions([...outputOptions, ...userOutputOptions])
-            .videoBitrate("16k")
-            .videoFilters(videoFilters.join(","))
-            .setSize("512x512")
-            .toFormat("webp")
-            .saveToFile(path);
+        return new Promise((resolve, reject) => {
+            const command = ffmpeg(stream)
+                .withVideoCodec("libwebp")
+                .withOptions([...outputOptions, ...userOutputOptions])
+                .videoBitrate("16k")
+                .videoFilters(videoFilters.join(","))
+                .setSize("512x512")
+                .toFormat("webp");
 
-        return await this.manageConvertEvents(command);
+            this.manageConvertEvents(command, resolve, reject).saveToFile(path);
+        });
     }
 
-    async manageConvertEvents(command: FfmpegCommand) {
-        return new Promise((resolve, reject) => {
-            command.on("start", (commandLine) => console.log(commandLine));
-            command.on("progess", (progress) => console.log(progress));
-            command.on("end", () => resolve(""));
-            command.on("error", (err: Error) => reject(err));
-        });
+    manageConvertEvents(
+        command: FfmpegCommand,
+        res: (value: unknown) => void,
+        rej: (reason: any) => void
+    ) {
+        command.on("start", (commandLine) => console.log(commandLine));
+        command.on("progress", (progress) => console.log(progress));
+        command.on("end", () => res(""));
+        command.on("error", (err: Error) => rej(err));
+
+        return command;
     }
 }

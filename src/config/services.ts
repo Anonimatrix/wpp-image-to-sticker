@@ -6,7 +6,7 @@ import { WhatsappService } from "../services/whatsapp/WhatsappService";
 import { RequestManager } from "../services/whatsapp/RequestManager";
 import { RequestManagerInterface } from "../services/whatsapp/Interfaces/RequestManager";
 import { ResponseManagerInterface } from "../services/whatsapp/Interfaces/ResponseManager";
-import { ConverterManager } from "../services/whatsapp/Converter/ConverterManager";
+import { ConverterManager } from "../services/Converter/ConverterManager";
 
 interface ServicesInterface {
     server: ServerInterface;

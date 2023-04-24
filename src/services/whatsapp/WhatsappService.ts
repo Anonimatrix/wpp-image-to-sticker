@@ -82,7 +82,7 @@ export class WhatsappService {
             responseType: "arraybuffer",
         });
 
-        return Buffer.from(res.data, "binary");
+        return Buffer.from(res.data);
     }
 
     async sendMessage(phone: string, message: string, type: string = "text") {

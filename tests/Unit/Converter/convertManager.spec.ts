@@ -1,4 +1,4 @@
-import { ConverterManager } from "../../../src/services/whatsapp/Converter/ConverterManager";
+import { ConverterManager } from "../../../src/services/Converter/ConverterManager";
 import { readFileSync } from "fs";
 import { join } from "path";
 import { path } from "@ffmpeg-installer/ffmpeg";

@@ -16,7 +16,7 @@ export class RequestManager implements RequestManagerInterface {
         if (!media_url) {
             await services.wpp.sendMessage(
                 from,
-                "Please send a image to convert in sticker"
+                "Please send a image|gif|video to convert in sticker. \nYou can use speed=number (example: speed=2) to set the speed of the video."
             );
             return 400;
         }

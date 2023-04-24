@@ -14,15 +14,13 @@ export class RequestManager implements RequestManagerInterface {
             entry
         );
 
-        if (!media_url) {
-            await services.wpp.sendMessage(from, invalidFormatMessage);
-            return 400;
-        }
-
         if (!(await services.chatManager.getChatByNumber(from))) {
             await services.chatManager.addChat(from);
 
             await services.wpp.sendMessage(from, welcomeMessage, "text");
+        } else if (!media_url) {
+            await services.wpp.sendMessage(from, invalidFormatMessage);
+            return 400;
         }
 
         try {

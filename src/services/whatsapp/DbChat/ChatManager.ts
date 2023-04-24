@@ -10,8 +10,12 @@ interface ChatsInterface {
 export class DbChatManager implements ChatManagerInterface {
     protected chats: ChatsInterface = {};
 
-    public async getChatByNumber(phone: string): Promise<ChatInterface> {
+    public async getChatByNumber(
+        phone: string
+    ): Promise<ChatInterface | undefined> {
         const chat = ChatModel.findOne({ phone });
+
+        if (!chat) return undefined;
 
         return new services.chat(chat.phone);
     }

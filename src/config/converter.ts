@@ -12,6 +12,13 @@ export const optionsOutputQueries: {
     [key: string]: (value: string) => string;
 } = {
     // "240p": () => `-vf scale=426:240`,
+    quality: (value: string) => {
+        if (Number(value) < 0 || Number(value) > 100 || isNaN(Number(value))) {
+            value = String(7);
+        }
+
+        return `-q:v ${value}`;
+    },
 };
 
 export const outputOptions = [

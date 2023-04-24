@@ -13,7 +13,7 @@ export class DbChatManager implements ChatManagerInterface {
     public async getChatByNumber(
         phone: string
     ): Promise<ChatInterface | undefined> {
-        const chat = ChatModel.findOne({ phone });
+        const chat = await ChatModel.findOne({ phone });
 
         if (!chat) return undefined;
 

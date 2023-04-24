@@ -5,7 +5,7 @@ export const cropQuery = `crop='${minSize}':'${minSize}':'if(gte(ih, iw), 0, iw 
 
 export const optionsVideoQueries: { [key: string]: (value: string) => string } =
     {
-        speed: (value: string) => `setpts=${value}*PTS`,
+        speed: (value: string) => `setpts=PTS/${value}`,
     };
 
 export const optionsOutputQueries: {

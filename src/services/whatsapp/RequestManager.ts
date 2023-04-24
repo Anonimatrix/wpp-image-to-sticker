@@ -1,6 +1,5 @@
 import { services } from "../../config/services";
 import { RequestManagerInterface } from "./Interfaces/RequestManager";
-import { Readable } from "stream";
 
 export class RequestManager implements RequestManagerInterface {
     async manage(entry: any) {

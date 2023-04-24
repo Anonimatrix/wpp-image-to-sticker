@@ -1,4 +1,3 @@
-import axios from "axios";
 import { ResponseManagerInterface } from "../whatsapp/Interfaces/ResponseManager";
 import { path } from "@ffmpeg-installer/ffmpeg";
 import ffmpeg, { FfmpegCommand } from "fluent-ffmpeg";
@@ -11,7 +10,8 @@ import { ConverterOptions } from "./Interfaces/ConverterOptions";
 import { services } from "../../config/services";
 import {
     cropQuery,
-    optionsQueries,
+    optionsOutputQueries,
+    optionsVideoQueries,
     outputOptions,
     regexOption,
 } from "../../config/converter";
@@ -57,11 +57,23 @@ export class ConverterManager implements ResponseManagerInterface {
 
         Object.entries(options).forEach(([key, value]) => {
             //If the option is not valid, ignore it
-            optionsQueries[key] &&
-                videoFilters.push(optionsQueries[key](value));
+            optionsVideoQueries[key] &&
+                videoFilters.push(optionsVideoQueries[key](value));
         });
 
         return videoFilters;
+    }
+
+    filterOutputOptions(options: ConverterOptions) {
+        const outputOptions: string[] = [];
+
+        Object.entries(options).forEach(([key, value]) => {
+            //If the option is not valid, ignore it
+            optionsOutputQueries[key] &&
+                outputOptions.push(optionsOutputQueries[key](value));
+        });
+
+        return outputOptions;
     }
 
     getTempPath(file: Buffer | string, ext = "webp") {
@@ -78,15 +90,18 @@ export class ConverterManager implements ResponseManagerInterface {
         stream.push(buffer);
         stream.push(null);
 
-        //Set the crop query
+        //Get video filters
         const videoFilters = this.filtersVideoOptions(options);
         if (cropQuery) videoFilters.push(cropQuery);
+
+        //Get output options
+        const outputOptions = this.filterOutputOptions(options);
 
         //Create a md5 filename with ffmpeg
         const path = this.getTempPath(buffer);
 
         // Create a webp file in output stream
-        await this.convertFile(stream, path, videoFilters);
+        await this.convertFile(stream, path, videoFilters, outputOptions);
 
         //Convert the file to buffer and delete it
         const outputBuffer = readFileSync(path);
@@ -95,10 +110,15 @@ export class ConverterManager implements ResponseManagerInterface {
         return outputBuffer;
     }
 
-    async convertFile(stream: Readable, path: string, videoFilters: string[]) {
+    async convertFile(
+        stream: Readable,
+        path: string,
+        videoFilters: string[] = [],
+        userOutputOptions: string[] = []
+    ) {
         const command = ffmpeg(stream)
             .withVideoCodec("libwebp")
-            .withOptions(outputOptions)
+            .withOptions([...outputOptions, ...userOutputOptions])
             .videoBitrate("16k")
             .videoFilters(videoFilters.join(","))
             .setSize("512x512")

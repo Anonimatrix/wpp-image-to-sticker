@@ -19,7 +19,7 @@ export class RequestManager implements RequestManagerInterface {
             return 400;
         }
 
-        if (services.chatManager.getChatByNumber(from) === undefined) {
+        if (!(await services.chatManager.getChatByNumber(from))) {
             await services.chatManager.addChat(from);
 
             await services.wpp.sendMessage(from, welcomeMessage, "text");

@@ -3,8 +3,13 @@ import { ChatInterface } from "../Interfaces/ChatInterface";
 import { config } from "../../../config/chats";
 
 export class LocalChat implements ChatInterface {
+    public readonly phone: string;
     protected messages: MessageInterface[] = [];
     protected timeoutChat?: NodeJS.Timeout;
+
+    constructor(phone: string) {
+        this.phone = phone;
+    }
 
     public getMessages(): MessageInterface[] {
         return this.messages;

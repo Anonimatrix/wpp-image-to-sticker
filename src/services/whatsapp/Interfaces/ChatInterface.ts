@@ -1,11 +1,14 @@
 import { MessageInterface } from "./MessageInterface";
 
 export interface ChatInterface {
-    getMessages(): MessageInterface[];
+    readonly phone: string;
 
-    addMessage(message: MessageInterface, timeoutCallback?: () => {}): void;
+    getMessages(): MessageInterface[] | Promise<MessageInterface[]>;
 
-    getLastMessage(): MessageInterface | undefined;
+    addMessage(message: MessageInterface): void | Promise<void>;
 
-    clearTimeoutChat(): void;
+    getLastMessage():
+        | MessageInterface
+        | undefined
+        | Promise<MessageInterface | undefined>;
 }

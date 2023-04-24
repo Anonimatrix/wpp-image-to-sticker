@@ -1,4 +1,6 @@
+import { invalidFormatMessage, welcomeMessage } from "../../config/messages";
 import { services } from "../../config/services";
+import { ChatInterface } from "./Interfaces/ChatInterface";
 import { RequestManagerInterface } from "./Interfaces/RequestManager";
 
 export class RequestManager implements RequestManagerInterface {
@@ -14,11 +16,14 @@ export class RequestManager implements RequestManagerInterface {
         );
 
         if (!media_url) {
-            await services.wpp.sendMessage(
-                from,
-                "Please send a image|gif|video to convert in sticker. \nYou can use speed=number (example: speed=2) to set the speed of the video."
-            );
+            await services.wpp.sendMessage(from, invalidFormatMessage);
             return 400;
+        }
+
+        if (services.chatManager.getChatByNumber(from) === undefined) {
+            await services.chatManager.addChat(from);
+
+            await services.wpp.sendMessage(from, welcomeMessage, "text");
         }
 
         try {
